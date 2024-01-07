@@ -9,27 +9,30 @@ def print_loc(loc):
 
 print('eachpoint.py')
 
-print(cq.Workplane().size())
-print(cq.Workplane().objects)
-print(cq.Workplane().box(1, 1, 1).objects)
-
-a = cq.Workplane().box(1, 2, 3).faces('Z').box(1, 1, 1)
-
+a = cq.Workplane().box(1, 2, 3)
 a.eachpoint(print_loc)
 print('a.all() =', a.all())
 '''
-(translation, rotation) = ((-7.8e-18, 1.96e-17, 0.135), (0, -0, 0))
-a.all() = [<cadquery.cq.Workplane object at 0x000001AD0D625090>]
+(translation, rotation) = ((4.77e-18, 2.31e-18, 3.7e-17), (0, -0, 0))
+a.all() = [<cadquery.cq.Workplane object at 0x000001D947CB6090>]
 '''
 
-b = a.add(cq.Solid.makeBox(4, 0.1, 0.1))
-
+b = a.faces('Z').sphere(1)
 b.eachpoint(print_loc)
 print('b.all() =', b.all())
 '''
-(translation, rotation) = ((-7.8e-18, 1.96e-17, 0.135), (0, -0, 0))
-(translation, rotation) = ((2, 0.05, 0.05), (0, -0, 0))
-b.all() = [<cadquery.cq.Workplane object at 0x000001AD0D644450>, <cadquery.cq.Workplane object at 0x000001AD0D645490>]
+(translation, rotation) = ((-3.09e-10, 2.61e-10, 0.538), (0, -0, 0))
+b.all() = [<cadquery.cq.Workplane object at 0x000001D947D89190>]
 '''
 
-c = b.box(0.2, 5, 1)
+c = b.add(cq.Solid.makeBox(4, 0.1, 0.1))
+c.eachpoint(print_loc)
+print('c.all() =', c.all())
+'''
+(translation, rotation) = ((-3.09e-10, 2.61e-10, 0.538), (0, -0, 0))
+(translation, rotation) = ((2, 0.05, 0.05), (0, -0, 0))
+c.all() = [<cadquery.cq.Workplane object at 0x000001D947D88490>, <cadquery.cq.Workplane object at 0x000001D947D8A0D0>]
+'''
+
+d = c.box(0.2, 5, 1)
+show_object(d)
