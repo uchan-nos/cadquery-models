@@ -62,7 +62,9 @@ def new():
     return tn
 
 def main():
-    show_object(new())
+    obj = new()
+    show_object(obj)
+    obj.save('step_files/TangNano.step')
 
 if __name__ == '__cq_main__':
     main()
