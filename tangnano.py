@@ -5,34 +5,36 @@ PLATE_L = 58.34
 PLATE_W = 21.29
 PLATE_THICKNESS = 1.6
 PIN_WIDTH = 17.78
-HOLE_R = 0.6
+PAD_INNER_R = 0.6
+PAD_OUTER_R = 0.8
 SWITCH_HEIGHT = 2
 
 def new():
     pin_offset_x = -PLATE_L/2 + 2.54
 
+    pin_pos = [(xi * 2.54 + pin_offset_x, sign * PIN_WIDTH/2)
+            for sign in (-1, 1) for xi in range(0, 20)]
+    pad_pos = [(20 * 2.54 + pin_offset_x, sign * (PIN_WIDTH/2 - off))
+            for sign in (-1, 1) for off in (0, 2.54)]
+
     plate_face = cq.Workplane().rect(PLATE_L, PLATE_W)
-    plate_face = plate_face.pushPoints(
-            [(20 * 2.54 + pin_offset_x, y)
-                for y in (-PIN_WIDTH/2 + 2.54, PIN_WIDTH/2 - 2.54)] +
-            [(xi * 2.54 + pin_offset_x, y)
-                for y in (-PIN_WIDTH/2, PIN_WIDTH/2)
-                for xi in range(0, 21)])
-    plate_face = plate_face.circle(HOLE_R)
+    plate_face = plate_face.pushPoints(pin_pos + pad_pos).circle(PAD_OUTER_R)
     plate = plate_face.extrude(PLATE_THICKNESS).edges('|Z').fillet(1)
 
     pin = pin_header.new()
-    pad = cq.Workplane().cylinder(0.03, 0.8).faces('>Z').hole(HOLE_R*2)
+    pad = (
+            cq.Workplane()
+            .cylinder(PLATE_THICKNESS + 0.1, 0.8)
+            .faces('>Z').hole(PAD_INNER_R*2)
+            )
 
     tn = cq.Assembly().add(plate, color=cq.Color('gray60'))
-    for yi in range(2):
-        y = (yi - 0.5) * PIN_WIDTH
-        for xi in range(0, 21):
-            x = xi * 2.54 + pin_offset_x
-            loc_pin = cq.Location((x, y, 0), (1, 0, 0), 180)
-            loc_pad = cq.Location((x, y, PLATE_THICKNESS))
-            tn.add(pin, name=f'pin{yi}.{xi}', loc=loc_pin)
-            tn.add(pad, name=f'pad{yi}.{xi}', loc=loc_pad, color=cq.Color('gold'))
+    for pos in pin_pos:
+        loc_pin = cq.Location((pos[0], pos[1], 0), (1, 0, 0), 180)
+        tn.add(pin, name=f'pin{pos}', loc=loc_pin)
+    for pos in pin_pos + pad_pos:
+        loc_pad = cq.Location((pos[0], pos[1], PLATE_THICKNESS/2))
+        tn.add(pad, name=f'pad{pos}', loc=loc_pad, color=cq.Color('gold'))
 
     btn = (
             cq.Workplane()
