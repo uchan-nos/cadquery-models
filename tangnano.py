@@ -17,9 +17,14 @@ def new():
     pad_pos = [(20 * 2.54 + pin_offset_x, sign * (PIN_WIDTH/2 - off))
             for sign in (-1, 1) for off in (0, 2.54)]
 
-    plate_face = cq.Workplane().rect(PLATE_L, PLATE_W)
-    plate_face = plate_face.pushPoints(pin_pos + pad_pos).circle(PAD_OUTER_R)
-    plate = plate_face.extrude(PLATE_THICKNESS).edges('|Z').fillet(1)
+    plate2d = (
+            cq.Workplane().sketch()
+            .rect(PLATE_L, PLATE_W).vertices().fillet(1)
+            .push(pin_pos + pad_pos).circle(PAD_OUTER_R, mode='s')
+            .finalize()
+            )
+    plate = plate2d.extrude(PLATE_THICKNESS - 0.2).translate((0, 0, 0.1))
+    surface = plate2d.extrude(PLATE_THICKNESS).cut(plate)
 
     pin = pin_header.new()
     pad = (
@@ -28,7 +33,11 @@ def new():
             .faces('>Z').hole(PAD_INNER_R*2)
             )
 
-    tn = cq.Assembly().add(plate, color=cq.Color('gray60'))
+    tn = (
+            cq.Assembly()
+            .add(plate, color=cq.Color('gray80'))
+            .add(surface, color=cq.Color('gray30'))
+            )
     for pos in pin_pos:
         loc_pin = cq.Location((pos[0], pos[1], 0), (1, 0, 0), 180)
         tn.add(pin, name=f'pin{pos}', loc=loc_pin)
