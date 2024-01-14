@@ -23,8 +23,16 @@ def new():
             .push(pin_pos + pad_pos).circle(PAD_OUTER_R, mode='s')
             .finalize()
             )
-    plate = plate2d.extrude(PLATE_THICKNESS - 0.2).translate((0, 0, 0.1))
-    surface = plate2d.extrude(PLATE_THICKNESS).cut(plate)
+    plate = plate2d.extrude(PLATE_THICKNESS)
+    surface_back = plate2d.extrude(-0.01)
+    surface_front = surface_back.mirror('XY', (0, 0, PLATE_THICKNESS/2))
+
+    tn = (
+            cq.Assembly()
+            .add(plate, color=cq.Color('gray80'))
+            .add(surface_front, color=cq.Color('gray20'))
+            .add(surface_back, color=cq.Color('gray20'))
+            )
 
     pin = pin_header.new()
     pad = (
@@ -33,11 +41,6 @@ def new():
             .faces('>Z').hole(PAD_INNER_R*2)
             )
 
-    tn = (
-            cq.Assembly()
-            .add(plate, color=cq.Color('gray80'))
-            .add(surface, color=cq.Color('gray30'))
-            )
     for pos in pin_pos:
         loc_pin = cq.Location((pos[0], pos[1], 0), (1, 0, 0), 180)
         tn.add(pin, name=f'pin{pos}', loc=loc_pin)
