@@ -1,5 +1,7 @@
 import cadquery as cq
 import pin_header
+import gw1n_qn48
+from lib import ic
 
 PLATE_L = 58.34
 PLATE_W = 21.29
@@ -27,11 +29,18 @@ def new():
     surface_back = plate2d.extrude(-0.01)
     surface_front = surface_back.mirror('XY', (0, 0, PLATE_THICKNESS/2))
 
+    name_text = (
+            surface_front.faces('>Z').workplane()
+            .text('Tang Nano', 2.5, 0.01, cut=False, font='Eras Bold ITC')
+            .translate((18.3 - PLATE_L/2, PLATE_W/2 - 9, 0))
+            )
+
     tn = (
             cq.Assembly()
             .add(plate, color=cq.Color('gray80'))
             .add(surface_front, color=cq.Color('gray20'))
             .add(surface_back, color=cq.Color('gray20'))
+            .add(name_text, color=cq.Color('white'))
             )
 
     pin = pin_header.new()
@@ -72,6 +81,14 @@ def new():
     loc_b = cq.Location((PLATE_L/2 - 2, 1 - PIN_WIDTH/2, switch_z))
     tn.add(switch, name='sw-a', loc=loc_a)
     tn.add(switch, name='sw-b', loc=loc_b)
+
+    ch552t = ic.new_tssop(20)
+    loc_ch552t = cq.Location((17.5, 0, PLATE_THICKNESS), (0, 0, 1), 90)
+    tn.add(ch552t, loc=loc_ch552t)
+
+    gw1n = gw1n_qn48.new()
+    loc_gw1n = cq.Location((3, -0.5, PLATE_THICKNESS), (0, 0, 1), 90)
+    tn.add(gw1n, loc=loc_gw1n)
 
     return tn
 
