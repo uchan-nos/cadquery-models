@@ -84,3 +84,48 @@ def new_tssop(num_pins):
         result.add(pin, loc=loc_pin_mirror, color=cq.Color('gray'))
 
     return result
+
+def new_qfn(num_pins, width, pitch, mark1='hole'):
+    num_pins_4 = int(num_pins/4)
+    t = 0.7
+    pin_t = 0.2
+    pin_w = pitch/2
+    pin_l = pitch/1.25
+    pins = (
+            cq.Workplane()
+            .rarray(pitch, width - pin_l, num_pins_4, 2)
+            .box(pin_w, pin_l, pin_t)
+            .rarray(width - pin_l, pitch, 2, num_pins_4)
+            .box(pin_l, pin_w, pin_t)
+            .translate((0, 0, pin_t/2))
+            )
+    gnd = (
+            cq.Workplane()
+            .box(width - pin_l*4, width - pin_l*4, pin_t)
+            .edges('>(-1, 1, 0)').chamfer(pin_l)
+            .translate((0, 0, pin_t/2))
+            )
+    body = (
+            cq.Workplane()
+            .box(width, width, t)
+            .translate((0, 0, t/2))
+            .cut(pins).cut(gnd)
+            )
+
+    result = (
+            cq.Assembly()
+            .add(pins, color=cq.Color('gray'))
+            .add(gnd, color=cq.Color('gray'))
+            )
+
+    mark1_pos = width/2 - width/8
+    mark1_plane = body.faces('>Z').workplane().center(-mark1_pos, mark1_pos)
+    if mark1 == 'white':
+        mark1_obj = mark1_plane.cylinder(0.1, width/30, combine=False)
+        body = body.cut(mark1_obj)
+        result.add(mark1_obj, color=cq.Color('white'))
+    elif mark1 == 'hole':
+        body = mark1_plane.hole(width/10, 0.1)
+    result.add(body, color=cq.Color('gray10'))
+
+    return result
