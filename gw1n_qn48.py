@@ -1,3 +1,9 @@
+'''
+Copyright (c) 2024 Kota UCHIDA
+
+GW1N-QN48: GW1N series FPGA, QFN48 package (Gowin)
+'''
+
 from lib import ic
 
 def new():

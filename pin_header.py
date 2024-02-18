@@ -1,3 +1,9 @@
+'''
+Copyright (c) 2024 Kota UCHIDA
+
+Generic pin header
+'''
+
 import cadquery as cq
 
 def new(length=11.6, pitch=2.54, pin_thickness=0.64, lower_length=2.98):
