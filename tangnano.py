@@ -1,3 +1,9 @@
+'''
+Copyright (c) 2024 Kota UCHIDA
+
+Tang Nano: FPGA Board (Sipeed)
+'''
+
 import cadquery as cq
 import pin_header
 import gw1n_qn48
