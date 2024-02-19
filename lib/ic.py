@@ -1,4 +1,5 @@
 import cadquery as cq
+from lib import obj
 
 def new_pin_smd(t, h, l, w):
     '''
@@ -6,45 +7,24 @@ def new_pin_smd(t, h, l, w):
 
          |------ l -------|        |- w -|
                           |
-          -------.p1      |         -----
+          -------.        |         -----
     ---- |        `       |        |     |
-      |   -----    \ p2            |     |
-     h|      p4\    `-----  ----   |-----|
+      |   -----    \               |     |
+     h|        \    `-----  ----   |-----|
       |         \         |  |t    |     |
-    ---------- p3`--------  ----    -----
+    -----------  `--------  ----    -----
     '''
 
-    tilt_v = 0.05
-    tilt_h = 0.05
+    tilt_v = h/10.0
+    tilt_h = l/30.0
     l2 = l/2
     t2 = t/2
-    p1 = (l2 + t2 - tilt_v, h + t2)
-    p2 = (l2 + t2 + tilt_v, t + tilt_h*(1 - t/(l2)))
-    p3 = (l2 - t2 + tilt_v, tilt_h)
-    p4 = (l2 - t2 - tilt_v, h - t2)
-    pin = (
-            cq.Workplane('XZ')
-            .moveTo(0, h + t2)
-            .lineTo(*p1)
-            .lineTo(*p2)
-            .lineTo(l, t)
-            .lineTo(l - t*tilt_h/(l - p3[0]), 0)
-            .lineTo(*p3)
-            .lineTo(*p4)
-            .lineTo(0, h - t2)
-            .close()
-            .extrude(w)
-            .edges('|Y and >(1, 0, 2)')
-            .fillet(t)
-            .edges('|Y and <(1, 0, 2)')
-            .fillet(t)
-            .edges(cq.selectors.NearestToPointSelector((p2[0], -w/2, p2[1])))
-            .fillet(t/5)
-            .edges(cq.selectors.NearestToPointSelector((p4[0], -w/2, p4[1])))
-            .fillet(t/5)
-            .translate((0, w/2, 0))
-            )
-    return pin
+    return obj.bended_board_2d(cq.Workplane('XZ'), [
+        (0, h),
+        (l2 - tilt_v, h),
+        (l2 + tilt_v, t2 + tilt_h),
+        (l, t2)
+    ], t).extrude(w).translate((0, w/2, 0))
 
 def new_tssop(num_pins):
     body_t = 1.0
