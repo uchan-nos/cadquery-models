@@ -58,7 +58,7 @@ def new():
             )
 
     result = (
-            cq.Assembly()
+            cq.Assembly(name='CNZ1023')
             .add(body, name='body', loc=cq.Location((0, 0, H/2)), color=cq.Color('gray10'))
             .add(arm, name='arm', color=cq.Color('gray10'))
             .add(leg, name='leg1', loc=cq.Location((1.27, 7.6/2, 0)), color=cq.Color('gray'))
@@ -78,7 +78,7 @@ def new():
 def main():
     obj = new()
     show_object(obj)
-    obj.save('step_files/CNZ1023.step')
+    obj.save('step_files/CNZ1023.step', mode='fused')
 
 if __name__ == '__cq_main__':
     main()
