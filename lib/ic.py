@@ -19,7 +19,7 @@ def new_pin_smd(t, h, l, w):
     tilt_h = l/30.0
     l2 = l/2
     t2 = t/2
-    return obj.bended_board_2d(cq.Workplane('XZ'), [
+    return obj.bended_plate_2d(cq.Workplane('XZ'), [
         (0, h),
         (l2 - tilt_v, h),
         (l2 + tilt_v, t2 + tilt_h),

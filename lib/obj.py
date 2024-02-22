@@ -11,7 +11,7 @@ class NullSelector(Selector):
     def filter(self, objectList):
         return []
 
-def bended_board_2d(workplane, way_points, board_t, sharpness=0.5):
+def bended_plate_2d(workplane, way_points, board_t, sharpness=0.5):
     '''
     板を曲げ加工したような図形の横面図を生成
 

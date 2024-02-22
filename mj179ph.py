@@ -53,7 +53,7 @@ def new():
             .pushPoints([(0, -10/2, 0)])
             .box(3, 10, pin_plus_t)
             )
-    pin_plus = obj.bended_board_2d(pin_plus.transformed((90, 0, 0), (0, 2.5/2, 0)), [
+    pin_plus = obj.bended_plate_2d(pin_plus.transformed((90, 0, 0), (0, 2.5/2, 0)), [
             (0, 0),
             (pin_plus_hlen, 0),
             (pin_plus_hlen, 1.7)
@@ -81,7 +81,7 @@ def new():
             )
 
     cn_t = 0.25
-    cn_gnd = obj.bended_board_2d(cq.Workplane('YZ', origin=(-4/2, 0, 0)),
+    cn_gnd = obj.bended_plate_2d(cq.Workplane('YZ', origin=(-4/2, 0, 0)),
             [
                 (7.5 + cn_t/2, 1 + cn_t/2),
                 (1.2 + cn_t/2, 1 + cn_t/2),
@@ -96,7 +96,7 @@ def new():
             .box(2.5, cn_t, 3.5 + 1)
             )
 
-    cn_fix = obj.bended_board_2d(cq.Workplane('XZ', origin=(0, 9.5, 0)),
+    cn_fix = obj.bended_plate_2d(cq.Workplane('XZ', origin=(0, 9.5, 0)),
             [
                 (-2, 3.8 + (pin_plus_t + cn_t)/2),
                 (4.7 + pin_plus_t/2, 3.8 + (pin_plus_t + cn_t)/2),
