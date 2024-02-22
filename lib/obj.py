@@ -58,10 +58,17 @@ def bended_board_2d(workplane, way_points, board_t, sharpness=0.5):
         side1_points.append(side_points[0])
         side2_points.append(side_points[1])
 
-        if l1_dir < l0_dir:
+        reldir = l1_dir - l0_dir # relative direction
+        if reldir > math.pi:
+            reldir -= math.pi * 2
+        elif reldir < -math.pi:
+            reldir += math.pi * 2
+        # Now, -pi <= reldir <= pi
+
+        if reldir < 0:
             outer_points.append(side_points[0])
             inner_points.append(side_points[1])
-        elif l1_dir > l0_dir:
+        elif reldir > 0:
             outer_points.append(side_points[1])
             inner_points.append(side_points[0])
 
