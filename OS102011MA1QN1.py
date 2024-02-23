@@ -32,7 +32,7 @@ def new():
             (0, 4.0),
             (0, 4.7 - plate_t/2),
             (plate_t/2 - 0.6, 4.7 - plate_t/2),
-        ], plate_t, sharpness=1)
+        ], plate_t, fillet=0.1)
         .extrude(4.4 - 2*0.5)
         .translate((8.6/2 - plate_t/2, (4.4 - 2*0.5)/2, 0))
     )
@@ -60,7 +60,7 @@ def new():
             (4.4/2 - plate_t/2, 4.7 - plate_t/2),
             (4.4/2 - plate_t/2, 0.7),
             (3.0/2, 0.3),
-        ], plate_t, sharpness=1)
+        ], plate_t, fillet=0.1)
         .extrude(main_plate_width)
         .translate((-main_plate_width/2, 0, 0))
         .cut(main_plate_slit)
