@@ -1,5 +1,14 @@
+import sys
+
+import cadquery as cq
+
 T = True
 F = False
+
+O = cq.Vector(0, 0, 0)
+ex = cq.Vector(1, 0, 0)
+ey = cq.Vector(0, 1, 0)
+ez = cq.Vector(0, 0, 1)
 
 # ステップネジのステップの部分の直径
 STEP_SCREW_STEP_D = 3.2
@@ -37,5 +46,20 @@ L4_THICKNESS = 1.5
 L4_LENGTH = 70
 
 # ドーザーアーム
-ARM_LENGTH_SHORT = 20 # 中央の穴から端の穴までの距離
-ARM_LENGTH_LONG = 50  # 中央の穴から端の穴までの距離
+ARM_LENGTH_SHORT = 35 # 中央の穴から端の穴までの距離
+ARM_LENGTH_LONG = 85  # 中央の穴から端の穴までの距離
+
+def new_hex_shaft(length, dia=3.0):
+    hexVecs = [cq.Vector(loc.toTuple()[0]) for loc in
+               cq.Sketch().parray(dia/2, 0, 360, 6).vals()]
+    shaft = (
+        cq.Workplane()
+        .sketch()
+        .polygon(hexVecs)
+        .finalize()
+        .extrude(length)
+    )
+    return shaft
+
+if '..' not in sys.path:
+    sys.path.append('..')
