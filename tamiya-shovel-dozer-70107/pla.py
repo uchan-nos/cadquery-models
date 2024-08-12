@@ -1,17 +1,11 @@
+import math
+
 import cadquery as cq
 from const import *
 
-def new_hex_shaft(length, dia=3.0):
-    hexVecs = [cq.Vector(loc.toTuple()[0]) for loc in
-               cq.Sketch().parray(dia/2, 0, 360, 6).vals()]
-    shaft = (
-        cq.Workplane()
-        .sketch()
-        .polygon(hexVecs)
-        .finalize()
-        .extrude(length)
-    )
-    return shaft
+class ClosedSelector(cq.Selector):
+    def filter(self, objectList):
+        return filter(lambda o: o.IsClosed(), objectList)
 
 def new_l1():
     SHAFT_HOLDER_LENGTH = 10
@@ -48,6 +42,7 @@ def new_l1():
         .hole(SCREW_HOLE_INNER_D)
         .add(shaft_holder_r)
         .add(shaft_holder_l)
+        .rotate((0, 0, 0), (0, 0, 1), 180)
     )
     return l1
 
@@ -89,6 +84,7 @@ def new_l3():
 
     l3 = (
         cq.Workplane()
+        .pushPoints([p0])
         .sketch()
         .arc(p0, SCREW_HOLE_OUTER_D/2 + 1, 0, 360)
         .arc(p1, SCREW_HOLE_OUTER_D/2,     0, 360)
@@ -189,35 +185,30 @@ def new_arm():
         .extrude(2)
         .faces('>Z')
         .workplane()
-        .pushPoints([p1, p2])
-        .hole(SHAFT_HOLE_D)
         .pushPoints([p0])
         .hole(STEP_SCREW_STEP_D)
+        .pushPoints([p1, p2])
+        .hole(SHAFT_HOLE_D)
     )
 
     return arm
 
 def main():
-    L2_L3_SPACE = 2
-
     l1 = new_l1()
     l2 = new_l2()
     l3 = new_l3()
-    #l2_l3_spacer = new_spacer(L2_L3_SPACE)
     l4 = new_l4()
+    spacer = new_spacer()
     arm = new_arm()
-
-    shaft = new_hex_shaft(20)
 
     assy = (
         cq.Assembly()
-        .add(l1, loc=cq.Location((0, 30, 0)))
-        .add(l2)
-        .add(l3, loc=cq.Location((0, L3_LENGTH_LONG - L2_LENGTH, -L2_L3_SPACE), (0, 1, 0), 180))
-        #.add(l2_l3_spacer, loc=cq.Location((0, -L2_LENGTH, -L2_L3_SPACE/2)))
-        .add(shaft, loc=cq.Location((0, 0, 5.2)), color=cq.Color('goldenrod'))
-        .add(l4, loc=cq.Location((60, 0, 0)))
-        .add(arm, loc=cq.Location((0, -30, 0)))
+        .add(l1, loc=cq.Location((0, 0, 0)))
+        .add(l2, loc=cq.Location((0, 30, 0)))
+        .add(l3, loc=cq.Location((20, 30, 0)))
+        .add(l4, loc=cq.Location((0, 60, 0)))
+        .add(spacer, loc=cq.Location((-20, 30, 0)))
+        .add(arm, loc=cq.Location((0, 80, 0)))
     )
     show_object(assy)
 
