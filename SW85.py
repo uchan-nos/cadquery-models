@@ -79,10 +79,12 @@ def new(color=cq.Color('lightgray')):
     )
 
     assy = (
-        cq.Assembly()
-        .add(side, color=color)
-        .add(bottom, color=color)
-        .add(guide, color=color)
+        cq.Assembly(name='all')
+        .add(side, name='case', color=color)
+        .add(
+            cq.Assembly(name='lid').add(bottom).add(guide),
+            color=color
+        )
     )
 
     return assy
@@ -91,6 +93,7 @@ def main():
     obj = new()
     show_object(obj)
     obj.save('step_files/SW85.step')
+    # obj.objects['case'] と obj.objects['lid'] でパーツごとに参照可能
 
 if __name__ == '__cq_main__':
     main()
