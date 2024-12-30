@@ -19,27 +19,30 @@ PIN_T = 0.3
 PIN_W = 2
 
 def new(plate_t=1):
+    centering_xy = (True, True, False)
+
     body_metal = (
-        cq.Workplane('YZ')
-        .cylinder(BODY_METAL_L, BODY_D/2, centered=(True, True, False))
-        .faces('<X')
+        cq.Workplane()
+        .cylinder(BODY_METAL_L, BODY_D/2, centered=centering_xy)
+        .translate((0, 0, -BODY_METAL_L))
+        .faces('>Z')
         .workplane()
-        .cylinder(NUT_BODY_GAP, NUT_M/2 - 0.5, centered=(True, True, False))
-        .faces('<X')
+        .cylinder(NUT_BODY_GAP, NUT_M/2 - 0.5, centered=centering_xy)
+        .faces('>Z')
         .workplane()
-        .cylinder(SCREW_L - NUT_BODY_GAP, NUT_M/2, centered=(True, True, False))
-        .faces('<X')
+        .cylinder(SCREW_L - NUT_BODY_GAP, NUT_M/2, centered=centering_xy)
+        .faces('>Z')
         .hole(3.6)
     )
     body_pla = (
-        cq.Workplane('YZ')
-        .cylinder(BODY_L - BODY_METAL_L, BODY_D/2, centered=(True, True, False))
-        .translate((BODY_METAL_L, 0, 0))
+        cq.Workplane()
+        .cylinder(BODY_L - BODY_METAL_L, BODY_D/2, centered=centering_xy)
+        .translate((0, 0, -BODY_L))
     )
 
     fixing_nut_w = 2
     fixing_nut = (
-        cq.Workplane('YZ')
+        cq.Workplane()
         .gear(
             cq_gears.SpurGear(
                 module=(BODY_D - 0.2)/30,
@@ -52,28 +55,28 @@ def new(plate_t=1):
                 chamfer=0.2
             )
         )
-        .translate((-fixing_nut_w - plate_t, 0, 0))
+        .translate((0, 0, plate_t))
     )
 
     sigpin_r = (
         cq.Workplane()
-        .box(SIGPIN_L, PIN_T, PIN_W, centered=(False, True, True))
-        .edges('|Y and >X')
+        .box(PIN_T, PIN_W, SIGPIN_L, centered=centering_xy)
+        .edges('|X and <Z')
         .fillet(0.4)
-        .faces('<Y')
-        .workplane(origin=(SIGPIN_L - 0.8, 0, 0))
+        .faces('>X')
+        .workplane(origin=(0, 0, 0.8))
         .hole(0.8)
-        .translate((BODY_L, 2.54, 0))
+        .translate((2.54, 0, -SIGPIN_L - BODY_L))
     )
-    sigpin_l = sigpin_r.mirror('XZ')
+    sigpin_l = sigpin_r.mirror('YZ')
 
     gndpin = (
         cq.Workplane()
-        .box(GNDPIN_L, PIN_W, PIN_T, centered=(False, True, True))
-        .faces('>Z')
-        .workplane(origin=(GNDPIN_L - 1, 0, 0))
+        .box(PIN_W, PIN_T, GNDPIN_L, centered=centering_xy)
+        .faces('>Y')
+        .workplane(origin=(0, 0, 1))
         .hole(0.8)
-        .translate((BODY_L, 0, 2.8))
+        .translate((0, 2.8, -GNDPIN_L - BODY_L))
     )
 
     pla_color = cq.Color('gray20')
