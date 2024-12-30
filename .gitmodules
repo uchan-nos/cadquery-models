@@ -1,0 +1,3 @@
+[submodule "lib/cq_gears"]
+	path = lib/cq_gears
+	url = git@github.com:meadiode/cq_gears.git
