@@ -121,7 +121,7 @@ def new():
     pincolor = cq.Color('gray90')
 
     assy = (
-        cq.Assembly(name='all')
+        cq.Assembly(name='AC-T09FB19')
         .add(top_plate, color=color)
         .add(body, color=color)
         .add(pin1, color=pincolor)

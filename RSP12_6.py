@@ -146,7 +146,7 @@ def new(fast=True, color=cq.Color('gray20')):
     )
 
     assy = (
-        cq.Assembly(name='all')
+        cq.Assembly(name='RSP12-6')
         .add(fixing_nut, name='fixing_nut', color=color)
         .add(pipe, name='pipe', color=color)
         .add(cover, name='cover', color=color)

@@ -79,7 +79,7 @@ def new(color=cq.Color('lightgray')):
     )
 
     assy = (
-        cq.Assembly(name='all')
+        cq.Assembly(name='SW-85')
         .add(side, name='case', color=color)
         .add(
             cq.Assembly(name='lid').add(bottom).add(guide),
