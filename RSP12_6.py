@@ -18,7 +18,7 @@ INT_LEN = 9
 EXT_LEN = 62
 HOLE_D = 8.4
 
-def new(fast=True, color=cq.Color('gray20')):
+def new(plate_t=1, color=cq.Color('gray20'), fast=True):
     fixing_nut = (
         hexnut.new(NUT_M, NUT_SIZE, NUT_T - 1.3, fillet_side='top')
         .intersect(
@@ -33,7 +33,7 @@ def new(fast=True, color=cq.Color('gray20')):
             .hole(NUT_M)
         )
         .rotate((0, 0, 0), (1, 0, 0), 180)
-        .translate((0, 0, -1.5))
+        .translate((0, 0, -plate_t))
     )
 
     pipe = (
@@ -155,7 +155,7 @@ def new(fast=True, color=cq.Color('gray20')):
     return assy
 
 def main():
-    obj = new(False)
+    obj = new(fast=False)
     show_object(obj)
     obj.save('step_files/RSP12-6B.step')
     # obj.objects[Name] でパーツごとに参照可能
