@@ -62,6 +62,24 @@ def new(m_dia, size, t, fillet_side=None, fillet_rate=2, angle=0):
 
     return cutted
 
+def new_with_seat(m_dia, size, total_t, seat_d, seat_t, fillet_side=None, fillet_rate=2, angle=0):
+    if fillet_side not in {None, 'top'}:
+        raise ValueError('fillet_side must be None or top')
+
+    return (
+        new(m_dia, size, total_t, fillet_side, fillet_rate, angle)
+        .intersect(
+            cq.Workplane()
+            .cylinder(total_t, seat_d/2, centered=(True, True, False))
+        )
+        .union(
+            cq.Workplane()
+            .cylinder(seat_t, seat_d/2, centered=(True, True, False))
+            .faces('>Z')
+            .hole(m_dia)
+        )
+    )
+
 def main():
     obj = new(12, 17, 5, fillet_side='both')
     show_object(obj)

@@ -20,18 +20,7 @@ HOLE_D = 8.4
 
 def new(plate_t=1, color=cq.Color('gray20'), fast=True):
     fixing_nut = (
-        hexnut.new(NUT_M, NUT_SIZE, NUT_T - 1.3, fillet_side='top')
-        .intersect(
-            cq.Workplane()
-            .cylinder(NUT_T, NUT_SEAT_D/2, centered=(True, True, False))
-        )
-        .translate((0, 0, 1.3))
-        .union(
-            cq.Workplane()
-            .cylinder(1.3, NUT_SEAT_D/2, centered=(True, True, False))
-            .faces('>Z')
-            .hole(NUT_M)
-        )
+        hexnut.new_with_seat(NUT_M, NUT_SIZE, NUT_T, NUT_SEAT_D, 1.3, fillet_side='top')
         .rotate((0, 0, 0), (1, 0, 0), 180)
         .translate((0, 0, -plate_t))
     )
