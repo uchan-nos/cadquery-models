@@ -41,7 +41,8 @@ def new(m_dia, size, t, fillet_side=None, fillet_rate=2, angle=0):
     cutter_h = cutter_r * math.cos(math.asin(size/2 / cutter_r))
     cutter = (
         cq.Workplane()
-        .cylinder(t + 1, e_radius + 1, centered=(True, True, False))
+        .cylinder(t/2, e_radius + 1, centered=(True, True, False))
+        .translate((0, 0, t/2))
         .cut(
             cq.Workplane()
             .sphere(cutter_r)
