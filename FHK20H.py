@@ -1,7 +1,7 @@
 '''
 Copyright (c) 2025 Kota UCHIDA
 
-FH-P20H: Fuse holder (ELPA)
+FH-K20H: Fuse holder (ELPA)
 '''
 
 import cadquery as cq
