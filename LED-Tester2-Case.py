@@ -5,6 +5,7 @@ LED-Tester2-Case: Original case for Uchan's LED Tester2
 '''
 
 import cadquery as cq
+import math
 
 import hexnut
 from lib import obj
@@ -151,7 +152,11 @@ def new_drawing():
         )
     )
     right = left.mirror('YZ')
-    right.plane.origin = cq.Vector(90/2, 0, 20/2)
+    right.plane = cq.Plane(
+        origin=(-left_plane.origin.x, left_plane.origin.y, left_plane.origin.z),
+        normal=(-left_plane.zDir.x, left_plane.zDir.y, left_plane.zDir.z),
+        xDir=(-left_plane.xDir.x, left_plane.xDir.y, left_plane.xDir.z)
+    )
 
     back_plane = cq.Plane(
         origin=(0, 60/2, 20/2),
@@ -183,14 +188,48 @@ def new_drawing():
         .rarray(LCD_HOLE_DISTANCE_X, LCD_HOLE_DISTANCE_Y, 2, 2)
         .hole(3)
     )
+    # 途中の .workplane でずれた原点を中央に戻しておく
+    bottom.plane = bottom_plane
 
-    return { k: v.section() for k,v in {
+    return {
         'top': top,
         'left': left,
         'right': right,
         'back': back,
         'bottom': bottom,
-    }.items()}
+    }
+
+def dxf_add_shape_at(dxf_doc, wp, pos, rotate_axis=None):
+    '''
+    DXF ドキュメントの指定された座標に wp の XY 断面を追加する。
+
+    @param wp   Workplane
+    @param pos  DXF ドキュメント上の二次元座標
+    @param rotate_axis  回転軸の方向
+    '''
+    if not isinstance(wp, cq.Workplane):
+        raise ValueError(f'wp must be a workplane: {type(wp)}')
+
+    from_orig = wp.plane.origin
+    from_zdir = wp.plane.zDir
+    to_orig = cq.Vector(pos)
+    to_zdir = cq.Vector(0, 0, 1)
+
+    if rotate_axis is not None:
+        rot_axis = cq.Vector(rotate_axis)
+    else:
+        rot_axis = from_zdir.cross(to_zdir)
+    rot_angl = math.degrees(to_zdir.getSignedAngle(from_zdir))
+
+    wp = wp.translate(to_orig - from_orig)
+    if rot_angl != 0:
+        if rot_axis == cq.Vector(0, 0, 0):
+            raise ValueError('rotate axis must be given')
+        wp = wp.rotate(to_orig, to_orig + rot_axis, rot_angl)
+    shape = cq.exporters.utils.toCompound(wp)
+
+    xy = cq.Workplane('XY')
+    return dxf_doc.add_shape(xy.add(shape.located(xy.plane.location)).section())
 
 def main():
     '''
@@ -199,48 +238,15 @@ def main():
     #obj.save('step_files/LED-Tester2-Case.step')
     '''
 
-    xy = cq.Workplane('XY')
-
     obj = new_drawing()
 
-    ex = cq.Vector(1, 0, 0)
-    ey = cq.Vector(0, 1, 0)
-    ez = cq.Vector(0, 0, 1)
+    dxf = cq.exporters.DxfDocument()
+    dxf_add_shape_at(dxf, obj['top'], (0, 0))
+    dxf_add_shape_at(dxf, obj['back'], (0, 60/2 + 20/2 + 0.1))
+    dxf_add_shape_at(dxf, obj['left'], (-(90/2 + 20/2 + 0.1), 0))
+    dxf_add_shape_at(dxf, obj['right'], (+(90/2 + 20/2 + 0.1), 0))
+    dxf_add_shape_at(dxf, obj['bottom'], (0, 60 + 20 + 0.1 + 0.1), (1, 0, 0))
 
-    back_comp = cq.exporters.utils.toCompound(obj['back'])
-    back = (
-        cq.Workplane(cq.Plane(origin=(0, 60/2 + 20/2 + 0.1, 0), xDir=-ex, normal=ez))
-        .add(back_comp.transformShape(obj['back'].plane.fG))
-    )
-    left_comp = cq.exporters.utils.toCompound(obj['left'])
-    left = (
-        cq.Workplane(cq.Plane(origin=(0, 90/2 + 20/2 + 0.1, 0), xDir=ey, normal=ez))
-        .add(left_comp.transformShape(obj['left'].plane.fG))
-    )
-    right_comp = cq.exporters.utils.toCompound(obj['right'])
-    right = (
-        cq.Workplane(cq.Plane(origin=(0, 90/2 + 20/2 + 0.1, 0), xDir=-ey, normal=-ez))
-        .add(right_comp.transformShape(obj['right'].plane.fG))
-    )
-    bottom_comp = cq.exporters.utils.toCompound(obj['bottom'])
-    bottom = (
-        cq.Workplane(cq.Plane(origin=(0, -71.2, 0), xDir=ex, normal=ez))
-        .add(bottom_comp.transformShape(obj['bottom'].plane.fG))
-    )
-
-    #show_object(obj['top'])
-    #show_object(obj['left'])
-    #show_object(obj['right'])
-    #show_object(obj['back'])
-    show_object(obj['bottom'])
-    dxf = (
-        cq.exporters.DxfDocument()
-        .add_shape(obj['top'])
-        .add_shape(back)
-        .add_shape(left)
-        .add_shape(right)
-        .add_shape(bottom)
-    )
     dxf.document.saveas("dxf_files/LED-Tester2-Case_panels.dxf")
 
     show_object(cq.importers.importDXF("dxf_files/LED-Tester2-Case_panels.dxf"))
