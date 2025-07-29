@@ -240,6 +240,12 @@ def main():
 
     obj = new_drawing()
 
+    for name, face in obj.items():
+        dxf = cq.exporters.DxfDocument()
+        rot_axis = (1, 0, 0) if name == 'bottom' else None
+        dxf_add_shape_at(dxf, face, (0, 0), rot_axis)
+        dxf.document.saveas(f'dxf_files/LED-Tester2-Case/{name}.dxf')
+
     dxf = cq.exporters.DxfDocument()
     dxf_add_shape_at(dxf, obj['top'], (0, 0))
     dxf_add_shape_at(dxf, obj['back'], (0, 60/2 + 20/2 + 0.1))
@@ -247,7 +253,7 @@ def main():
     dxf_add_shape_at(dxf, obj['right'], (+(90/2 + 20/2 + 0.1), 0))
     dxf_add_shape_at(dxf, obj['bottom'], (0, 60 + 20 + 0.1 + 0.1), (1, 0, 0))
 
-    dxf.document.saveas("dxf_files/LED-Tester2-Case_panels.dxf")
+    dxf.document.saveas("dxf_files/LED-Tester2-Case/panels.dxf")
 
     show_object(cq.importers.importDXF("dxf_files/LED-Tester2-Case_panels.dxf"))
 
